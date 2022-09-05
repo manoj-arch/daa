@@ -1,40 +1,73 @@
-#include<stdio.h>
-#define sz 20
-#include<string.h>
-void push(char s[sz],int *top,char ch)
+#include <stdio.h>
+struct stock
 {
-*top=*top+1;
-s[*top]=ch;
-}
-void pop(int *top)
+ int left;
+ int right;
+ int sum;
+};
+struct stock crosssubsum (int *a,int low,int mid,int high)
 {
-*top=*top-1;
-}
-int main()
-{
-char in[sz],ch,s[sz];
-int i,top=-1;
-printf("enter the expression");
-scanf("%s",in);
-push(s,&top,'#');
-for(i=0;i<strlen(in);i++)
-{
- ch=in[i];
- if(ch=='(')
- push(s,&top,ch);
- if(ch==')')
+ int leftsum=0,rightsum=0,sum=0,i,j,maxleft=0,maxright=0;
+ struct stock res;
+ for (i=mid;i>=low;i--)
  {
- if(s[top]!='#')
- pop(&top);
+ sum = sum + a[i];
+ if (sum > leftsum)
+ {
+ leftsum = sum;
+ maxleft = i;
+ }
+ }
+ sum = 0;
+ for (j=mid+1;j<=high;j++)
+ {
+ sum = sum + a[j];
+ if (sum > rightsum)
+{
+ rightsum = sum;
+ maxright = j;
+ }
+ }
+ res.left = maxleft;
+ res.right = maxright;
+ res.sum = leftsum+rightsum;
+ return res;
+}
+struct stock maxsubsum (int *a,int low,int high)
+{
+ int mid;
+ struct stock leftsum,rightsum,crosssum,res;
+ if (low == high)
+ {
+ res.left = low;
+ res.right = high;
+ res.sum = a[low];
+ return res;
+ }
+ mid = (low+high)/2;
+ leftsum = maxsubsum( a,low,mid);
+ rightsum = maxsubsum (a,mid+1,high);
+ crosssum = crosssubsum (a,low,mid,high);
+ if (leftsum.sum >= rightsum.sum && leftsum.sum >=crosssum.sum)
+ return leftsum;
+ else if (rightsum.sum >= leftsum.sum && rightsum.sum >=crosssum.sum)
+ return rightsum;
  else
- {
-  printf("closiing parentheses are not balanced\n");
-  return(0);
-  }
-  }
-  }
-  if(s[top]=='#')
-  printf("parantheses are balanced");
-  else
-  printf("opening parentheses are not balanced");
+ return crosssum;
+}
+int main ()
+{
+ int n,a[10],i,low,high;
+ struct stock maxsum;
+ printf ("Enter the no. of Days in Stock Market\n");
+ scanf ("%d",&n);
+ printf ("Enter the Gain or Loss in Stock Market per Day\n");
+ for (i=0;i<n;i++)
+ scanf ("%d",&a[i]);
+ low =0; high = n-1;
+ maxsum = maxsubsum (a,low,high);
+ printf ("Maximum Profit in Stock Market lies from Day %d to Day
+%d\n",maxsum.left+1,maxsum.right+1);
+ printf ("Maximum Profit in Stock Market = %d\n",maxsum.sum);
+ return 0;
 }
