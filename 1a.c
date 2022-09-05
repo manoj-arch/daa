@@ -1,59 +1,49 @@
-#include<stdio.h>
-#define stack_size 5
-int s[stack_size];
-int top=-1;
-void push()
+#include <stdio.h>
+int crosssubsum (int a[],int low,int mid,int high)
 {
-	int n;
-	if(top==stack_size-1)
-	printf("stack is empty");
-	else
-	{
-		printf("enter element to add\n");
-		scanf("%d",&n);
-		s[++top]=n;
-	}
-}
-void pop()
-{
-	if(top==-1)
-	printf("stack is empty\n");
-	else
-	{
-	 printf("%d element is poped\n",s[top--]);
+ int leftsum=0,rightsum=0,sum=0,i;
+ for (i=mid;i>=low;i--)
+ {
+ sum = sum + a[i];
+ if (sum > leftsum)
+ leftsum = sum;
  }
+ sum = 0;
+ for (i=mid+1;i<=high;i++)
+ {
+ sum = sum + a[i];
+ if (sum > rightsum)
+ rightsum = sum;
+ }
+ return leftsum+rightsum;
 }
-void display()
+int maxsubsum (int a[],int low,int high)
 {
-	int i;
-	if(top==-1)
-	printf("stack is empty\n");
-	else
-	{
-		printf("elements in stack\n");
-		for(i=top;i>=0;i--)
-		printf("%d\n",s[i]);
-	}
-	
+ int mid,leftsum,rightsum,crosssum;
+ if (low == high)
+ return a[low];
+ mid = (low+high)/2;
+ leftsum = maxsubsum( a,low,mid);
+ rightsum = maxsubsum (a,mid+1,high);
+ crosssum = crosssubsum (a,low,mid,high);
+ if (leftsum >= rightsum && leftsum >=crosssum)
+ return leftsum;
+ else if (rightsum >= leftsum && rightsum >=crosssum)
+ return rightsum;
+ else
+ return crosssum;
 }
-int main()
-{
-	int ch;
-	for(;;)
-	{
-		printf("enter your choice\n");
-		printf("\n1.push\t2.pop\t3.display\t4.exit\n");
-		scanf("%d",&ch);
-		switch(ch)
-		{
-			case 1: push(); break;
-			case 2: pop(); break;
-			case 3: display(); break;
-			case 4: return 0;
-			default:printf("invalid chooice");
-		}
-	
-	}
-}
-		
-	
+int main ()
+{		
+int n,a[10],i,low,high,maxsum;
+ printf ("Enter the no. of Elements\n");
+ scanf ("%d",&n);
+ printf ("Enter an Array of +ve and -ve No.\n");
+ for (i=0;i<n;i++)
+ scanf ("%d",&a[i]);
+ low = 0;
+ high = n-1;
+ maxsum = maxsubsum (a,low,high);
+ printf ("Maximum Contiguous Sum = %d\n",maxsum);
+ return 0;
+}	
